@@ -1,0 +1,12 @@
+td{
+  text-align: center;
+}
+th,table{
+  text-align: center;
+}
+.posleft{
+  position: absolute;
+  left: 0;
+  text-align: center;
+
+}

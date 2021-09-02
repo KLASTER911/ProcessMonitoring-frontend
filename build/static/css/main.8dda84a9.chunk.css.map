@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://src/index.css"],"names":[],"mappings":"AAMA,qBAFE,iBAOF,CALA,SACE,iBAAkB,CAClB,MAGF","file":"main.8dda84a9.chunk.css","sourcesContent":["td{\n  text-align: center;\n}\nth,table{\n  text-align: center;\n}\n.posleft{\n  position: absolute;\n  left: 0;\n  text-align: center;\n\n}"]}
