@@ -14,8 +14,8 @@ class ProcessTable extends Component {
     }
     
     componentDidMount(){
-        this.getServicesList();
-        setInterval(()=>{this.updateServiceData()}, 5000)
+        this.updateServiceData();
+        setInterval(()=>{this.updateServiceData()}, 30000)
         
     }
 
@@ -27,6 +27,7 @@ class ProcessTable extends Component {
             servicesList[service] = {'data':serviceInfo.info[0]}
         }
         this.setState({services:servicesList});
+        console.log(this.state)
     }
 
     async getServicesList() {      
@@ -34,10 +35,29 @@ class ProcessTable extends Component {
         let json = await reqServiceList.json();
         return json;}
 
+    async startAllServices(){
+        console.log('start all services');
+        for (let service in this.state.services){
+            await this.startService(service);
+        }
+    }
+    async stopAllServices(){
+        console.log('stop all services');
+        for (let service in this.state.services){
+            await this.stopService(service);
+        }
+    }
+    async restartAllServices(){            
+        console.log('restart all services');
+        for (let service in this.state.services){
+            await this.restartService(service);
+        }
+    }
+    
     startService(name){
         let startService = fetch(`${url}\\service\\${name}\\start`,{method:'POST'})
                             .then(response=>response.text())
-                            .then(data=> {console.log(data)})
+                            .then(data=> {console.log(data);this.updateServiceData()})
                             .catch(error=> {console.log('error', error)})
         console.log(startService);
     }
@@ -45,7 +65,7 @@ class ProcessTable extends Component {
     stopService(name){
         let stopService = fetch(`${url}\\service\\${name}\\stop`, { method: 'POST' })
             .then(response => response.text())
-            .then(data => { console.log(data) })
+            .then(data => { console.log(data);this.updateServiceData() })
             .catch(error => { console.log('error', error) })
         console.log(stopService);
     }
@@ -53,15 +73,15 @@ class ProcessTable extends Component {
     restartService(name) {
         let restartService = fetch(`${url}\\service\\${name}\\restart`, { method: 'POST' })
             .then(response => response.text())
-            .then(data => { console.log(data) })
+            .then(data => { console.log(data);this.updateServiceData() })
             .catch(error => { console.log('error', error) })
-        console.log(restartService);
+        //console.log(restartService);
     }
 
     async infoService(name) {
         let infoService = await fetch(`${url}\\service\\${name}\\getInfo`, { method: 'GET' })
         let json = await infoService.json();
-        //console.log(json)
+        console.log(json)
         return json;
     }
     
@@ -70,26 +90,26 @@ class ProcessTable extends Component {
             let tableStrings = [];
             let i = 0;
             for (const [serviceName, value] of Object.entries(this.state.services)) {
-                console.log(`${serviceName}: ${value.data.status}`);
+                //console.log(`${serviceName}: ${value.data.status}`);
               
                 var tbStr = (
                     <tr key={i}>
                         <td>{i}</td>
                         <td>{serviceName}</td>
                         <td style={{ color: value.data.status === 'stopped' ? 'red' : 'green' }}>{value.data.status}</td>
-                        <td><button class="btn mx-1 btn-outline-success" onClick={() => console.log('start')}>Запустить</button>
-                            <button class="btn mx-1 btn-outline-danger" onClick={() => console.log('stop')}>Остановить</button>
-                            <button class="btn mx-1 btn-outline-dark" onClick={() => console.log('restart')}>Перезапустить</button></td>
+                        <td><button class="btn mx-1 btn-outline-success" onClick={() => this.startService(serviceName)}>Запустить</button>
+                            <button class="btn mx-1 btn-outline-danger" onClick={() => this.stopService(serviceName)}>Остановить</button>
+                            <button class="btn mx-1 btn-outline-dark" onClick={() => this.restartService(serviceName)}>Перезапустить</button></td>
                     </tr>)
                 tableStrings.push(tbStr);
-                console.log(i,tableStrings);
+//                console.log(i,tableStrings);
                 i = i + 1;
             }
-            console.log("tableS1",tableStrings)
+//            console.log("tableS1",tableStrings)
             return tableStrings;
         }
         else{
-            console.log(false);
+//            console.log(false);
             return [<h1>load</h1>];
         }
 
@@ -110,9 +130,9 @@ class ProcessTable extends Component {
                     {this.tableStrings()}
                 </tbody>
         </table>    
-                <button class="btn mx-1 btn-outline-success" onClick = {()=> this.startService("StorageNode")}>Запустить ноды</button>
-                <button class="btn mx-1 btn-outline-danger" onClick = {()=> this.stopService("StorageNode")}>Остановить ноды</button>
-                <button class="btn mx-1 btn-outline-dark"  onClick = {()=> this.restartService("StorageNode")}>Перезапустить ноды</button>
+                <button class="btn mx-1 btn-outline-success" onClick = {()=> this.startAllServices()}>Запустить ноды</button>
+                <button class="btn mx-1 btn-outline-danger" onClick = {()=> this.stopAllServices()}>Остановить ноды</button>
+                <button class="btn mx-1 btn-outline-dark"  onClick = {()=> this.restartAllServices()}>Перезапустить ноды</button>
                 <button class="btn mx-1 btn-outline-primary" onClick = {()=>this.getServicesList()}>Обновить статусы нод</button>
         </div>)
         }
